@@ -75,16 +75,23 @@ updateMonthLabels();
   startMarketTicker();
 });
 
-/* ---------- LIVE MARKET TICKER ---------- */
+/* ---------- LIVE MARKET TICKER ----------
+   Pulls US indexes from CNBC (full CORS, no key) and crypto from CoinGecko.
+   Runs fully client-side. Refreshes every 30s. */
 function fmtPrice(key, p) {
-  if (p == null) return "—";
-  if (key === "btc" || key === "eth") return "$" + Math.round(p).toLocaleString();
-  return p.toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  if (p == null || isNaN(p)) return "—";
+  if (key === "btc" || key === "eth") return "$" + Math.round(p).toLocaleString("en-US");
+  return Number(p).toLocaleString("en-US", { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 }
 function fmtPct(c) {
   if (c == null || isNaN(c)) return "—";
   const sign = c >= 0 ? "+" : "";
-  return sign + c.toFixed(2) + "%";
+  return sign + Number(c).toFixed(2) + "%";
+}
+function parseCnbcNum(s) {
+  if (s == null) return null;
+  const n = Number(String(s).replace(/[, %+]/g, ""));
+  return isNaN(n) ? null : n;
 }
 function renderMarketTicker(items) {
   const track = document.getElementById("marketTicker");
@@ -98,13 +105,45 @@ function renderMarketTicker(items) {
   // Duplicate for seamless scroll loop
   track.innerHTML = html + html;
 }
-async function fetchMarket() {
+async function fetchIndexes() {
   try {
-    const r = await fetch("/_functions/market", { cache: "no-store" });
-    if (!r.ok) return;
+    const url = "https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=.SPX|.IXIC|.DJI&requestMethod=itv&noform=1&fund=1&output=json&exthrs=1";
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) return [];
     const j = await r.json();
-    renderMarketTicker(j.items || []);
-  } catch (e) { /* swallow */ }
+    const arr = j?.FormattedQuoteResult?.FormattedQuote || [];
+    const map = {
+      ".SPX":  { key: "sp500",  label: "S&P 500" },
+      ".IXIC": { key: "nasdaq", label: "NASDAQ" },
+      ".DJI":  { key: "dow",    label: "DOW" },
+    };
+    return arr.map((q) => {
+      const m = map[q.symbol];
+      if (!m) return null;
+      return {
+        key: m.key,
+        label: m.label,
+        price: parseCnbcNum(q.last),
+        changePct: parseCnbcNum(q.change_pct),
+      };
+    }).filter(Boolean);
+  } catch (e) { return []; }
+}
+async function fetchCrypto() {
+  try {
+    const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true", { cache: "no-store" });
+    if (!r.ok) return [];
+    const j = await r.json();
+    return [
+      { key: "btc", label: "BTC", price: j?.bitcoin?.usd,  changePct: j?.bitcoin?.usd_24h_change  ?? 0 },
+      { key: "eth", label: "ETH", price: j?.ethereum?.usd, changePct: j?.ethereum?.usd_24h_change ?? 0 },
+    ];
+  } catch (e) { return []; }
+}
+async function fetchMarket() {
+  const [idx, crypto] = await Promise.all([fetchIndexes(), fetchCrypto()]);
+  const items = [...idx, ...crypto];
+  if (items.length) renderMarketTicker(items);
 }
 function startMarketTicker() {
   fetchMarket();
