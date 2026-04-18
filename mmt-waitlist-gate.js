@@ -5,7 +5,7 @@
   if (document.getElementById("mmt-waitlist-gate")) return;
 
   window.MMT_CONFIG = window.MMT_CONFIG || {};
-  window.MMT_CONFIG.WAITLIST_ENDPOINT = "/_functions/waitlist";
+  window.MMT_CONFIG.WAITLIST_ENDPOINT = "https://dashboard.makemoneytrading.com.au/api/waitlist";
 
   /* ---- ANTI-FLASH: hide the Wix site content immediately ----
      Injected synchronously as the first thing so no Wix frame ever paints. */
