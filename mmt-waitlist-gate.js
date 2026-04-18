@@ -49,10 +49,12 @@
    Standalone waitlist page (no site below the intro)
    ========================================================= */
 
-// Endpoint where form submissions are sent.
-// Set to null or "" to use demo mode (logs to console + localStorage).
-// Will be wired to Wix Velo HTTP function / Airtable.
-const WAITLIST_ENDPOINT = (window.MMT_CONFIG && window.MMT_CONFIG.WAITLIST_ENDPOINT) || null;
+// Endpoint where form submissions are sent. Posts to the MMT sales dashboard,
+// where Baylee + the sales team see new leads on the Waitlist page.
+// Override with window.MMT_CONFIG.WAITLIST_ENDPOINT for staging/testing.
+const WAITLIST_ENDPOINT =
+  (window.MMT_CONFIG && window.MMT_CONFIG.WAITLIST_ENDPOINT) ||
+  "https://dashboard.makemoneytrading.com.au/api/waitlist";
 
 document.documentElement.classList.add("mmt-gate-on");
 
