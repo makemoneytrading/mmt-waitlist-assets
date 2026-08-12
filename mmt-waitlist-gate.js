@@ -448,6 +448,14 @@ function initFlywheel() {
   const SEG = CIRC / 4;
   const open = new Set();
 
+  /* Mobile-only: the "Systems" lock card is hidden via CSS on <=720px, so
+     users can only tap 3 of 4 locks. Auto-open Systems on init and treat
+     the total as 3 so the wheel + counter fully close at 3/3.
+     Live-update if orientation change crosses the 720px breakpoint. */
+  const mq = window.matchMedia('(max-width: 720px)');
+  const hiddenIdOnMobile = 'systems';
+  const totalFor = () => (mq.matches ? LOCKS.length - 1 : LOCKS.length);
+
   // one coloured quarter-arc + one node per lock
   LOCKS.forEach((l, i) => {
     const seg = document.createElementNS(SVGNS, 'circle');
@@ -546,30 +554,70 @@ function initFlywheel() {
   }
 
   function syncWheel() {
-    const n = open.size;
-    wheel.dataset.open = n;
+    const total = totalFor();
+    /* Count visible (user-tappable) locks that are open. On mobile the
+       hidden Systems lock is auto-opened silently but excluded from the
+       count so "3 / 3" reads correctly. */
+    const visibleOpen = Array.from(open).filter(id => !(mq.matches && id === hiddenIdOnMobile)).length;
+    const n = visibleOpen;
+    const full = n === total;
+    wheel.dataset.open = open.size; // spinner speed still keys off total open (including auto)
     const hv = $$$('#wheel-count');
     const hk = $$$('#wheel-hubk');
     if (hv) {
-      hv.textContent = n === 4 ? 'Profitable' : (n + '/4');
-      hv.classList.toggle('done', n === 4);
+      hv.textContent = full ? 'Profitable' : (n + '/' + total);
+      hv.classList.toggle('done', full);
     }
     if (hk) {
-      hk.textContent = n === 4 ? 'Trader' : 'Unlocked';
-      hk.classList.toggle('done', n === 4);
+      hk.textContent = full ? 'Trader' : 'Unlocked';
+      hk.classList.toggle('done', full);
     }
     const cnt = $$$('#fly-count');
     const msg = $$$('#fly-msg');
     const status = $$$('#fly-status');
-    if (cnt) cnt.textContent = n === 4 ? 'ALL FOUR OPEN' : (n + '/4 UNLOCKED');
-    if (msg) msg.textContent = MSG[n];
-    if (status) status.classList.toggle('full', n === 4);
+    if (cnt) cnt.textContent = full ? (total === 4 ? 'ALL FOUR OPEN' : 'ALL THREE OPEN') : (n + '/' + total + ' UNLOCKED');
+    if (msg) msg.textContent = MSG[Math.min(n, MSG.length - 1)];
+    if (status) status.classList.toggle('full', full);
     /* Toggle .all-open on the flywheel wrap so the Trustpilot pill reveals
        even in browsers without :has() support. */
     const wrap = wheel.closest('.fly-wrap');
-    if (wrap) wrap.classList.toggle('all-open', n === 4);
-    n === 4 ? runMoney() : stopMoney();
+    if (wrap) wrap.classList.toggle('all-open', full);
+    full ? runMoney() : stopMoney();
   }
+
+  /* Silently mark the hidden Systems lock as open on mobile so its arc
+     segment + node render as if tapped, and syncWheel treats the
+     remaining 3 visible locks as the full set. */
+  function applyHiddenLockState() {
+    const seg = spokes.querySelector('[data-seg="' + hiddenIdOnMobile + '"]');
+    const node = spokes.querySelector('[data-node="' + hiddenIdOnMobile + '"]');
+    const lock = LOCKS.find(x => x.id === hiddenIdOnMobile);
+    if (!seg || !node || !lock) return;
+    if (mq.matches) {
+      open.add(hiddenIdOnMobile);
+      seg.setAttribute('stroke-dasharray', SEG.toFixed(1) + ' ' + CIRC.toFixed(1));
+      node.setAttribute('fill', lock.hue);
+      node.setAttribute('stroke', lock.hue);
+    } else {
+      open.delete(hiddenIdOnMobile);
+      seg.setAttribute('stroke-dasharray', '0 ' + CIRC.toFixed(1));
+      node.setAttribute('fill', '#0a0a0a');
+      node.setAttribute('stroke', '#2a2a2a');
+      // reset the hidden button visual state too
+      const btn = locksBox.querySelector('[data-lock-id="' + hiddenIdOnMobile + '"]');
+      if (btn) {
+        btn.setAttribute('aria-pressed', 'false');
+        const ico = btn.querySelector('.ico'); if (ico) ico.innerHTML = LOCK_CLOSED;
+        const d = btn.querySelector('.d'); if (d) d.innerHTML = lock.pain;
+        const s = btn.querySelector('.state'); if (s) s.textContent = 'Locked';
+      }
+    }
+    syncWheel();
+  }
+  applyHiddenLockState();
+  // Handle orientation / resize crossing the 720px breakpoint.
+  if (mq.addEventListener) mq.addEventListener('change', applyHiddenLockState);
+  else if (mq.addListener) mq.addListener(applyHiddenLockState);
 }
 
 /* ============ SECTION 2 · CERTIFICATE WALL ============
