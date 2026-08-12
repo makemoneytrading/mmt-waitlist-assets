@@ -653,12 +653,12 @@ function initFlywheel() {
     const existing = spokes.querySelector('#wheel-you-label');
     if (mq.matches) {
       if (existing) return;
-      // 9 o'clock = 180°. Sit ON the ring (r=92) where the stroke is.
+      // 6 o'clock = bottom of the ring. Sit ON the stroke (r=92 below center).
       const t = document.createElementNS(SVGNS, 'text');
       t.setAttribute('id', 'wheel-you-label');
       t.setAttribute('class', 'arc-label-you');
-      t.setAttribute('x', '28');
-      t.setAttribute('y', '120');
+      t.setAttribute('x', '120');
+      t.setAttribute('y', '212');
       t.textContent = 'You';
       spokes.appendChild(t);
     } else if (existing) {
