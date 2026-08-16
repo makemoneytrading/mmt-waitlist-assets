@@ -1129,21 +1129,21 @@ if (document.readyState === 'loading') {
     var s = document.createElement("style");
     s.id = "mmt-intent-gate-styles";
     s.textContent = "" +
-      "#mmt-intent-gate{position:fixed;inset:0;z-index:2147483646;background:#000;color:#f5f5f4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Instrument Serif','Satoshi','Inter',ui-serif,Georgia,serif;-webkit-font-smoothing:antialiased;text-align:center;animation:mig-in .45s cubic-bezier(.22,1,.36,1) both;overflow:hidden}" +
+      "#mmt-intent-gate{position:fixed;inset:0;z-index:2147483646;background:#000;color:#f5f5f4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Satoshi','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-align:center;animation:mig-in .45s cubic-bezier(.22,1,.36,1) both;overflow:hidden}" +
       /* Ambient trading-floor background layer. Sits behind everything at
          low opacity with a subtle radial vignette so the centre stays
          readable. */
-      "#mmt-intent-gate::before{content:'';position:absolute;inset:0;background-image:url(" + JSON.stringify(TF_BG) + ");background-size:cover;background-position:center;opacity:.14;filter:saturate(.85) contrast(1.05);pointer-events:none;z-index:0}" +
-      "#mmt-intent-gate::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 0%, transparent 30%, rgba(0,0,0,.55) 75%, #000 100%), linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 40%, transparent 60%, rgba(0,0,0,.4) 100%);pointer-events:none;z-index:1}" +
+      "#mmt-intent-gate::before{content:'';position:absolute;inset:0;background-image:url(" + JSON.stringify(TF_BG) + ");background-size:cover;background-position:center;opacity:.55;filter:saturate(.95) contrast(1.02);pointer-events:none;z-index:0}" +
+      "#mmt-intent-gate::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center, rgba(0,0,0,.28) 0%, rgba(0,0,0,.35) 40%, rgba(0,0,0,.55) 85%, rgba(0,0,0,.75) 100%), linear-gradient(180deg, rgba(0,0,0,.28) 0%, transparent 45%, transparent 55%, rgba(0,0,0,.3) 100%);pointer-events:none;z-index:1}" +
       "#mmt-intent-gate > *{position:relative;z-index:2}" +
       "#mmt-intent-gate.is-leaving{animation:mig-out .35s ease forwards}" +
       "@keyframes mig-in{from{opacity:0}to{opacity:1}}" +
       "@keyframes mig-out{to{opacity:0;transform:scale(1.02)}}" +
-      "#mmt-intent-gate .mig__license{position:absolute;bottom:22px;left:0;right:0;font-size:11px;letter-spacing:.08em;color:rgba(245,245,244,.42);font-family:'Satoshi','Inter',system-ui,sans-serif}" +
+      "#mmt-intent-gate .mig__license{position:absolute;bottom:22px;left:0;right:0;font-size:11px;letter-spacing:.14em;color:#FF6B1A;font-weight:600;font-family:'Satoshi','Inter',system-ui,sans-serif}" +
       "#mmt-intent-gate .mig__eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#FF6B1A;margin:0 0 26px;font-weight:500;font-family:'Satoshi','Inter',system-ui,sans-serif}" +
       /* Display headline: Instrument Serif italic — gives the whole moment
          an editorial, considered feel instead of the utilitarian sans. */
-      "#mmt-intent-gate .mig__h1{font-family:'Instrument Serif',ui-serif,Georgia,serif;font-style:italic;font-size:clamp(36px,7vw,80px);line-height:1.02;letter-spacing:-.015em;font-weight:400;max-width:920px;margin:0 0 40px;color:#fff;text-wrap:balance}" +
+      "#mmt-intent-gate .mig__h1{font-family:'Satoshi','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:clamp(32px,6vw,64px);line-height:1.08;letter-spacing:-.02em;font-weight:700;max-width:920px;margin:0 0 40px;color:#fff;text-wrap:balance}" +
       "#mmt-intent-gate .mig__row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-family:'Satoshi','Inter',system-ui,sans-serif}" +
       "#mmt-intent-gate .mig__btn{appearance:none;border:0;border-radius:999px;padding:16px 38px;font:inherit;font-size:16px;font-weight:600;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease,background .2s ease,box-shadow .2s ease}" +
       "#mmt-intent-gate .mig__btn--yes{background:#FF6B1A;color:#0b0b0b;box-shadow:0 8px 30px -8px rgba(255,107,26,.6)}" +
