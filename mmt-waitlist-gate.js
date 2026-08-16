@@ -899,7 +899,7 @@ function initProfitTarget() {
     const n = parseFloat(String(v).replace(/[^0-9.]/g, ''));
     return isFinite(n) ? n : 0;
   };
-  const usd2 = (n) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const usd2 = (n) => '$' + Math.round(n).toLocaleString('en-US');
 
   function render() {
     const wage = num(wageEl.value);
