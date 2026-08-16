@@ -524,8 +524,8 @@ function initFlywheel() {
     // Bounce class on the first lock pill.
     const firstBtn = locksBox.querySelector('.lock');
     if (firstBtn) firstBtn.classList.add('lock--nudge');
-    // Auto-cancel after 3 pulse cycles (~4.5s).
-    nudgeTimer = setTimeout(cancelNudge, 4800);
+    // 2026-08-16: nudge stays visible until user unlocks one of the 3 icons
+    // (cancelNudge is called from the lock click handler).
   }
   // Trigger once flywheel scrolls into view.
   if ('IntersectionObserver' in window) {
