@@ -1099,31 +1099,63 @@ if (document.readyState === 'loading') {
   }
   function injectIntentGateStyles() {
     if (document.getElementById("mmt-intent-gate-styles")) return;
+    /* Load Instrument Serif for the display headline (elegant, high-contrast
+       serif that reads as premium). Preload rel=preload so first paint is
+       swift; the font-display:swap in the CSS avoids FOIT. */
+    if (!document.getElementById("mmt-intent-serif")) {
+      var l = document.createElement("link");
+      l.id = "mmt-intent-serif";
+      l.rel = "stylesheet";
+      l.href = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap";
+      (document.head || document.documentElement).appendChild(l);
+    }
+    /* Trading-floor background — hosted alongside the bundle on jsDelivr so it
+       piggybacks the same CDN. Kept at ~7% opacity so it feels like ambient
+       depth, not a distracting photo. */
+    var TF_BG = "https://cdn.jsdelivr.net/gh/makemoneytrading/mmt-waitlist-assets@d628032/assets/trading-floor.jpg";
+    /* NOTE: the SHA above is the previous commit; the freshly pushed one is
+       swapped in below just before we PATCH the Wix embed. Because this bundle
+       is loaded from the SAME commit as the image, we can use a relative-ish
+       URL that points at the current script's dir. We resolve it dynamically
+       from the currently executing <script src>: */
+    var scr = document.currentScript || (function(){
+      var s = document.getElementsByTagName("script");
+      for (var i = s.length - 1; i >= 0; i--) if (s[i].src && s[i].src.indexOf("mmt-waitlist-gate.js") !== -1) return s[i];
+      return null;
+    })();
+    if (scr && scr.src) {
+      TF_BG = scr.src.replace(/mmt-waitlist-gate\.js.*$/, "assets/trading-floor.jpg");
+    }
     var s = document.createElement("style");
     s.id = "mmt-intent-gate-styles";
     s.textContent = "" +
-      "#mmt-intent-gate{position:fixed;inset:0;z-index:2147483646;background:#000;color:#f5f5f4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Satoshi','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-align:center;animation:mig-in .35s cubic-bezier(.22,1,.36,1) both}" +
+      "#mmt-intent-gate{position:fixed;inset:0;z-index:2147483646;background:#000;color:#f5f5f4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Instrument Serif','Satoshi','Inter',ui-serif,Georgia,serif;-webkit-font-smoothing:antialiased;text-align:center;animation:mig-in .45s cubic-bezier(.22,1,.36,1) both;overflow:hidden}" +
+      /* Ambient trading-floor background layer. Sits behind everything at
+         low opacity with a subtle radial vignette so the centre stays
+         readable. */
+      "#mmt-intent-gate::before{content:'';position:absolute;inset:0;background-image:url(" + JSON.stringify(TF_BG) + ");background-size:cover;background-position:center;opacity:.14;filter:saturate(.85) contrast(1.05);pointer-events:none;z-index:0}" +
+      "#mmt-intent-gate::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center, transparent 0%, transparent 30%, rgba(0,0,0,.55) 75%, #000 100%), linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 40%, transparent 60%, rgba(0,0,0,.4) 100%);pointer-events:none;z-index:1}" +
+      "#mmt-intent-gate > *{position:relative;z-index:2}" +
       "#mmt-intent-gate.is-leaving{animation:mig-out .35s ease forwards}" +
       "@keyframes mig-in{from{opacity:0}to{opacity:1}}" +
       "@keyframes mig-out{to{opacity:0;transform:scale(1.02)}}" +
-      "#mmt-intent-gate .mig__brand{position:absolute;top:22px;left:22px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,245,244,.55)}" +
-      "#mmt-intent-gate .mig__brand strong{color:#f5f5f4;font-weight:600}" +
-      "#mmt-intent-gate .mig__license{position:absolute;bottom:22px;left:0;right:0;font-size:11px;letter-spacing:.06em;color:rgba(245,245,244,.35)}" +
-      "#mmt-intent-gate .mig__eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#FF6B1A;margin:0 0 22px;font-weight:500}" +
-      "#mmt-intent-gate .mig__h1{font-size:clamp(28px,5.4vw,56px);line-height:1.1;letter-spacing:-.01em;font-weight:600;max-width:860px;margin:0 0 34px;color:#fff}" +
-      "#mmt-intent-gate .mig__row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}" +
-      "#mmt-intent-gate .mig__btn{appearance:none;border:0;border-radius:999px;padding:16px 34px;font:inherit;font-size:16px;font-weight:600;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease,background .2s ease,box-shadow .2s ease}" +
+      "#mmt-intent-gate .mig__license{position:absolute;bottom:22px;left:0;right:0;font-size:11px;letter-spacing:.08em;color:rgba(245,245,244,.42);font-family:'Satoshi','Inter',system-ui,sans-serif}" +
+      "#mmt-intent-gate .mig__eyebrow{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#FF6B1A;margin:0 0 26px;font-weight:500;font-family:'Satoshi','Inter',system-ui,sans-serif}" +
+      /* Display headline: Instrument Serif italic — gives the whole moment
+         an editorial, considered feel instead of the utilitarian sans. */
+      "#mmt-intent-gate .mig__h1{font-family:'Instrument Serif',ui-serif,Georgia,serif;font-style:italic;font-size:clamp(36px,7vw,80px);line-height:1.02;letter-spacing:-.015em;font-weight:400;max-width:920px;margin:0 0 40px;color:#fff;text-wrap:balance}" +
+      "#mmt-intent-gate .mig__row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;font-family:'Satoshi','Inter',system-ui,sans-serif}" +
+      "#mmt-intent-gate .mig__btn{appearance:none;border:0;border-radius:999px;padding:16px 38px;font:inherit;font-size:16px;font-weight:600;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease,background .2s ease,box-shadow .2s ease}" +
       "#mmt-intent-gate .mig__btn--yes{background:#FF6B1A;color:#0b0b0b;box-shadow:0 8px 30px -8px rgba(255,107,26,.6)}" +
       "#mmt-intent-gate .mig__btn--yes:hover{transform:translateY(-2px);box-shadow:0 12px 34px -8px rgba(255,107,26,.8)}" +
       "#mmt-intent-gate .mig__btn--no{background:transparent;color:#f5f5f4;border:1px solid rgba(245,245,244,.22)}" +
       "#mmt-intent-gate .mig__btn--no:hover{border-color:rgba(245,245,244,.6);color:#fff}" +
-      "#mmt-intent-gate .mig__caption{margin-top:22px;font-size:13px;color:rgba(245,245,244,.5);max-width:520px;letter-spacing:.01em}" +
-      "#mmt-intent-gate .mig__rocket{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;pointer-events:none;opacity:0;animation:mig-rocket 1.2s cubic-bezier(.22,1,.36,1) forwards}" +
+      "#mmt-intent-gate .mig__rocket{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;pointer-events:none;opacity:0;animation:mig-rocket 1.2s cubic-bezier(.22,1,.36,1) forwards;z-index:3}" +
       "@keyframes mig-rocket{0%{opacity:0;transform:translateY(30vh) scale(.6)}30%{opacity:1;transform:translateY(0) scale(1)}70%{opacity:1;transform:translateY(-10vh) scale(1.05)}100%{opacity:0;transform:translateY(-70vh) scale(1.15)}}" +
-      "#mmt-intent-gate.is-broke .mig__h1{color:#fff;font-size:clamp(48px,10vw,120px);letter-spacing:-.02em}" +
-      "#mmt-intent-gate.is-broke .mig__eyebrow,#mmt-intent-gate.is-broke .mig__row,#mmt-intent-gate.is-broke .mig__caption{display:none}" +
-      "#mmt-intent-gate.is-broke .mig__broke-sub{margin-top:24px;font-size:14px;color:rgba(245,245,244,.55);letter-spacing:.04em;text-transform:uppercase;animation:mig-in .5s .25s both}" +
-      "@media (max-width:520px){#mmt-intent-gate .mig__btn{padding:14px 26px;font-size:15px}#mmt-intent-gate .mig__row{flex-direction:row;gap:10px}#mmt-intent-gate .mig__h1{margin-bottom:28px}#mmt-intent-gate .mig__brand{top:16px;left:16px}}";
+      "#mmt-intent-gate.is-broke .mig__h1{color:#fff;font-size:clamp(56px,12vw,140px);letter-spacing:-.025em}" +
+      "#mmt-intent-gate.is-broke .mig__eyebrow,#mmt-intent-gate.is-broke .mig__row{display:none}" +
+      "#mmt-intent-gate.is-broke .mig__broke-sub{margin-top:28px;font-size:13px;color:rgba(245,245,244,.55);letter-spacing:.22em;text-transform:uppercase;font-family:'Satoshi','Inter',system-ui,sans-serif;animation:mig-in .5s .25s both}" +
+      "@media (max-width:520px){#mmt-intent-gate .mig__btn{padding:14px 30px;font-size:15px}#mmt-intent-gate .mig__row{gap:10px}#mmt-intent-gate .mig__h1{margin-bottom:32px}}";
     (document.head || document.documentElement).appendChild(s);
   }
   function showIntentGate(onYes) {
@@ -1133,15 +1165,17 @@ if (document.readyState === 'loading') {
     g.setAttribute("role", "dialog");
     g.setAttribute("aria-modal", "true");
     g.setAttribute("aria-labelledby", "mig-heading");
+    /* Copy locked with user 2026-08-16:
+       - No brand mark top-left (removed)
+       - No caption under the buttons (removed)
+       - AFSL block stays at the bottom for compliance */
     g.innerHTML =
-      '<div class="mig__brand"><strong>Make Money</strong> Trading</div>' +
       '<p class="mig__eyebrow">Before you enter</p>' +
       '<h1 class="mig__h1" id="mig-heading">Do you want to learn how to trade and get paid?</h1>' +
       '<div class="mig__row">' +
         '<button type="button" class="mig__btn mig__btn--yes" data-mig="yes" aria-label="Yes, take me to the site">Yes</button>' +
         '<button type="button" class="mig__btn mig__btn--no" data-mig="no" aria-label="No, exit">No</button>' +
       '</div>' +
-      '<p class="mig__caption">This is for people building toward funded accounts.</p>' +
       '<div class="mig__license">AFSL #460940 / AR #1310836</div>';
     document.body.appendChild(g);
     /* Lock scroll while gate is up so the site behind can't be reached via touch. */
@@ -1185,8 +1219,7 @@ if (document.readyState === 'loading') {
       g.classList.add("is-broke");
       var h1 = g.querySelector(".mig__h1");
       if (h1) h1.textContent = "Stay broke.";
-      /* Remove license/brand text so it doesn't undermine the punchline. */
-      var brand = g.querySelector(".mig__brand"); if (brand) brand.remove();
+      /* Remove license text so it doesn't undermine the punchline. */
       var lic = g.querySelector(".mig__license"); if (lic) lic.remove();
       var sub = document.createElement("p");
       sub.className = "mig__broke-sub";
