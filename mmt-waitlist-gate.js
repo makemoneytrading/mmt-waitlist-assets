@@ -14,7 +14,11 @@
     earlyStyle.id = "mmt-anti-flash";
     earlyStyle.textContent = "html.mmt-gate-prep { background: #000 !important; }" +
       "html.mmt-gate-prep body { background: #000 !important; visibility: hidden !important; }" +
-      "html.mmt-gate-prep #mmt-waitlist-gate { visibility: visible !important; }";
+      "html.mmt-gate-prep #mmt-waitlist-gate { visibility: visible !important; }" +
+      /* Keep the intent gate (2026-08-16) visible during the anti-flash
+         window too, otherwise the whole body is set to visibility:hidden
+         before we get to add the mmt-gate-on class. */
+      "html.mmt-gate-prep #mmt-intent-gate { visibility: visible !important; }";
     (document.head || document.documentElement).appendChild(earlyStyle);
     document.documentElement.classList.add("mmt-gate-prep");
   })();
@@ -1073,6 +1077,124 @@ if (document.readyState === 'loading') {
     } catch (err) { console.error("MMT waitlist boot error", err); }
   }
 
+  /* ============================================================
+     INTENT GATE (added 2026-08-16 per user)
+     A one-question pre-gate that renders BEFORE the site does.
+     Headline: "Do you want to learn how to trade and get paid?"
+     Yes  -> 🚀 flash, dismiss gate, smooth-scroll to hero
+     No   -> replace with "Stay Broke." dead-end screen
+     Session-scoped via sessionStorage (mmt_intent_gate_v1).
+     Bots and OG-preview crawlers bypass the gate entirely.
+     Lives directly in the bundle (not source). When source is
+     next rebuilt from /home/user/workspace/mmt-landing-v2, this
+     block MUST be back-ported or the gate will disappear.
+     ============================================================ */
+  var INTENT_KEY = "mmt_intent_gate_v1";
+  var UA = (navigator.userAgent || "").toLowerCase();
+  var IS_BOT = /(bot|crawler|spider|facebookexternalhit|meta-externalagent|preview|slurp|whatsapp|linkedinbot|twitterbot)/i.test(UA);
+  function shouldShowIntentGate() {
+    if (IS_BOT) return false;
+    try { if (sessionStorage.getItem(INTENT_KEY)) return false; } catch (_) {}
+    return true;
+  }
+  function injectIntentGateStyles() {
+    if (document.getElementById("mmt-intent-gate-styles")) return;
+    var s = document.createElement("style");
+    s.id = "mmt-intent-gate-styles";
+    s.textContent = "" +
+      "#mmt-intent-gate{position:fixed;inset:0;z-index:2147483646;background:#000;color:#f5f5f4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Satoshi','Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;-webkit-font-smoothing:antialiased;text-align:center;animation:mig-in .35s cubic-bezier(.22,1,.36,1) both}" +
+      "#mmt-intent-gate.is-leaving{animation:mig-out .35s ease forwards}" +
+      "@keyframes mig-in{from{opacity:0}to{opacity:1}}" +
+      "@keyframes mig-out{to{opacity:0;transform:scale(1.02)}}" +
+      "#mmt-intent-gate .mig__brand{position:absolute;top:22px;left:22px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(245,245,244,.55)}" +
+      "#mmt-intent-gate .mig__brand strong{color:#f5f5f4;font-weight:600}" +
+      "#mmt-intent-gate .mig__license{position:absolute;bottom:22px;left:0;right:0;font-size:11px;letter-spacing:.06em;color:rgba(245,245,244,.35)}" +
+      "#mmt-intent-gate .mig__eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#FF6B1A;margin:0 0 22px;font-weight:500}" +
+      "#mmt-intent-gate .mig__h1{font-size:clamp(28px,5.4vw,56px);line-height:1.1;letter-spacing:-.01em;font-weight:600;max-width:860px;margin:0 0 34px;color:#fff}" +
+      "#mmt-intent-gate .mig__row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}" +
+      "#mmt-intent-gate .mig__btn{appearance:none;border:0;border-radius:999px;padding:16px 34px;font:inherit;font-size:16px;font-weight:600;letter-spacing:.02em;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:transform .15s ease,background .2s ease,box-shadow .2s ease}" +
+      "#mmt-intent-gate .mig__btn--yes{background:#FF6B1A;color:#0b0b0b;box-shadow:0 8px 30px -8px rgba(255,107,26,.6)}" +
+      "#mmt-intent-gate .mig__btn--yes:hover{transform:translateY(-2px);box-shadow:0 12px 34px -8px rgba(255,107,26,.8)}" +
+      "#mmt-intent-gate .mig__btn--no{background:transparent;color:#f5f5f4;border:1px solid rgba(245,245,244,.22)}" +
+      "#mmt-intent-gate .mig__btn--no:hover{border-color:rgba(245,245,244,.6);color:#fff}" +
+      "#mmt-intent-gate .mig__caption{margin-top:22px;font-size:13px;color:rgba(245,245,244,.5);max-width:520px;letter-spacing:.01em}" +
+      "#mmt-intent-gate .mig__rocket{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;pointer-events:none;opacity:0;animation:mig-rocket 1.2s cubic-bezier(.22,1,.36,1) forwards}" +
+      "@keyframes mig-rocket{0%{opacity:0;transform:translateY(30vh) scale(.6)}30%{opacity:1;transform:translateY(0) scale(1)}70%{opacity:1;transform:translateY(-10vh) scale(1.05)}100%{opacity:0;transform:translateY(-70vh) scale(1.15)}}" +
+      "#mmt-intent-gate.is-broke .mig__h1{color:#fff;font-size:clamp(48px,10vw,120px);letter-spacing:-.02em}" +
+      "#mmt-intent-gate.is-broke .mig__eyebrow,#mmt-intent-gate.is-broke .mig__row,#mmt-intent-gate.is-broke .mig__caption{display:none}" +
+      "#mmt-intent-gate.is-broke .mig__broke-sub{margin-top:24px;font-size:14px;color:rgba(245,245,244,.55);letter-spacing:.04em;text-transform:uppercase;animation:mig-in .5s .25s both}" +
+      "@media (max-width:520px){#mmt-intent-gate .mig__btn{padding:14px 26px;font-size:15px}#mmt-intent-gate .mig__row{flex-direction:row;gap:10px}#mmt-intent-gate .mig__h1{margin-bottom:28px}#mmt-intent-gate .mig__brand{top:16px;left:16px}}";
+    (document.head || document.documentElement).appendChild(s);
+  }
+  function showIntentGate(onYes) {
+    injectIntentGateStyles();
+    var g = document.createElement("div");
+    g.id = "mmt-intent-gate";
+    g.setAttribute("role", "dialog");
+    g.setAttribute("aria-modal", "true");
+    g.setAttribute("aria-labelledby", "mig-heading");
+    g.innerHTML =
+      '<div class="mig__brand"><strong>Make Money</strong> Trading</div>' +
+      '<p class="mig__eyebrow">Before you enter</p>' +
+      '<h1 class="mig__h1" id="mig-heading">Do you want to learn how to trade and get paid?</h1>' +
+      '<div class="mig__row">' +
+        '<button type="button" class="mig__btn mig__btn--yes" data-mig="yes" aria-label="Yes, take me to the site">Yes</button>' +
+        '<button type="button" class="mig__btn mig__btn--no" data-mig="no" aria-label="No, exit">No</button>' +
+      '</div>' +
+      '<p class="mig__caption">This is for people building toward funded accounts.</p>' +
+      '<div class="mig__license">AFSL #460940 / AR #1310836</div>';
+    document.body.appendChild(g);
+    /* Lock scroll while gate is up so the site behind can't be reached via touch. */
+    var prevOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    function dismiss(cb) {
+      g.classList.add("is-leaving");
+      setTimeout(function(){
+        if (g.parentNode) g.parentNode.removeChild(g);
+        document.documentElement.style.overflow = prevOverflow || "";
+        if (typeof cb === "function") cb();
+      }, 340);
+    }
+    g.querySelector('[data-mig="yes"]').addEventListener("click", function() {
+      try { sessionStorage.setItem(INTENT_KEY, "yes"); } catch (_) {}
+      /* Rocket flash — 🚀 flies up before we dismiss. */
+      var rocket = document.createElement("div");
+      rocket.className = "mig__rocket";
+      rocket.textContent = "🚀";
+      g.appendChild(rocket);
+      /* Disable buttons during the animation. */
+      Array.prototype.forEach.call(g.querySelectorAll(".mig__btn"), function(b){ b.disabled = true; b.style.opacity = .5; });
+      setTimeout(function(){
+        dismiss(function() {
+          if (typeof onYes === "function") onYes();
+          /* After the site is revealed, smooth-scroll to the hero section. */
+          setTimeout(function() {
+            var hero = document.getElementById("s-flywheel") || document.getElementById("intro");
+            if (hero && hero.scrollIntoView) {
+              try { hero.scrollIntoView({ behavior: "smooth", block: "start" }); } catch(_) { hero.scrollIntoView(); }
+            }
+          }, 80);
+        });
+      }, 900);
+    });
+    g.querySelector('[data-mig="no"]').addEventListener("click", function() {
+      try { sessionStorage.setItem(INTENT_KEY, "no"); } catch (_) {}
+      /* Swap the gate into the "Stay Broke." dead-end. Do NOT reveal the
+         site — the user chose out. Session-scoped: refreshing brings back
+         the gate on a fresh visit. */
+      g.classList.add("is-broke");
+      var h1 = g.querySelector(".mig__h1");
+      if (h1) h1.textContent = "Stay broke.";
+      /* Remove license/brand text so it doesn't undermine the punchline. */
+      var brand = g.querySelector(".mig__brand"); if (brand) brand.remove();
+      var lic = g.querySelector(".mig__license"); if (lic) lic.remove();
+      var sub = document.createElement("p");
+      sub.className = "mig__broke-sub";
+      sub.textContent = "Close this tab.";
+      g.appendChild(sub);
+    });
+  }
+
   function mountOverlay() {
     if (document.getElementById("mmt-waitlist-gate")) {
       overlayReady = true;
@@ -1082,6 +1204,22 @@ if (document.readyState === 'loading') {
     if (!document.body) {
       /* body not parsed yet — retry on DOMContentLoaded */
       document.addEventListener("DOMContentLoaded", mountOverlay, { once: true });
+      return;
+    }
+    /* Show the intent gate BEFORE the site paints. If user says yes,
+       the callback continues into normal mount. If user says no, we
+       never proceed — the gate stays as the "Stay Broke." screen. */
+    if (shouldShowIntentGate()) {
+      showIntentGate(function proceedWithSite() { _mountOverlayInner(); });
+      return;
+    }
+    _mountOverlayInner();
+  }
+
+  function _mountOverlayInner() {
+    if (document.getElementById("mmt-waitlist-gate")) {
+      overlayReady = true;
+      maybeBoot();
       return;
     }
     var overlay = document.createElement("div");
