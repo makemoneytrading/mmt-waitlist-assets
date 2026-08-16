@@ -435,8 +435,10 @@ const LOCK_OPEN   = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
 
 /* ============ SECTION 1 · LOCKED FLYWHEEL ============ */
 const LOCKS = [
-  { id: 'strategy', label: 'Strategy', hue: GRN, pain: 'No defined edge',       fix: 'A proven process backed by data.' },
-  { id: 'systems',  label: 'Systems',  hue: GRN, pain: 'No repeatable routine', fix: 'Fundamentals, technicals and risk models.' },
+  /* 2026-08-16: Strategy removed. Systems inherits the old Strategy copy
+     ("A proven process backed by data."). Wheel is now three thirds
+     instead of four quarters (SEG = CIRC / 3, rotate every 120deg). */
+  { id: 'systems',  label: 'Systems',  hue: GRN, pain: 'No defined edge',       fix: 'A proven process backed by data.' },
   { id: 'software', label: 'Software', hue: GRN, pain: 'Trading blind',         fix: 'MMT-Algo scanning the markets.' },
   { id: 'support',  label: 'Support',  hue: GRN, pain: 'Figuring it out alone', fix: 'Live sessions with authorised advisors every 48 hours' },
 ];
@@ -449,16 +451,14 @@ function initFlywheel() {
 
   const SVGNS = 'http://www.w3.org/2000/svg';
   const CIRC = 2 * Math.PI * 92;
-  const SEG = CIRC / 4;
+  const SEG = CIRC / 3;  /* was CIRC / 4 - three locks now */
   const open = new Set();
 
-  /* Mobile-only: the "Systems" lock card is hidden via CSS on <=720px, so
-     users can only tap 3 of 4 locks. Auto-open Systems on init and treat
-     the total as 3 so the wheel + counter fully close at 3/3.
-     Live-update if orientation change crosses the 720px breakpoint. */
+  /* 2026-08-16: locks are now 3-across on both desktop and mobile.
+     Kept `mq` around so mobile-specific hub visual tweaks below still fire. */
   const mq = window.matchMedia('(max-width: 720px)');
-  const hiddenIdOnMobile = 'systems';
-  const totalFor = () => (mq.matches ? LOCKS.length - 1 : LOCKS.length);
+  const hiddenIdOnMobile = '__NONE__';
+  const totalFor = () => LOCKS.length;
 
   // one coloured quarter-arc + one node per lock
   LOCKS.forEach((l, i) => {
@@ -466,13 +466,13 @@ function initFlywheel() {
     seg.setAttribute('cx', 120); seg.setAttribute('cy', 120); seg.setAttribute('r', 92);
     seg.setAttribute('fill', 'none'); seg.setAttribute('stroke', l.hue);
     seg.setAttribute('stroke-width', 14); seg.setAttribute('stroke-linecap', 'butt');
-    seg.setAttribute('transform', 'rotate(' + (-90 + i * 90) + ' 120 120)');
+    seg.setAttribute('transform', 'rotate(' + (-90 + i * 120) + ' 120 120)');
     seg.setAttribute('stroke-dasharray', '0 ' + CIRC);
     seg.setAttribute('data-seg', l.id);
     seg.style.transition = 'stroke-dasharray .7s cubic-bezier(.22,1,.36,1)';
     spokes.appendChild(seg);
 
-    const a = (-90 + i * 90) * Math.PI / 180;
+    const a = (-90 + i * 120) * Math.PI / 180;
     const node = document.createElementNS(SVGNS, 'circle');
     node.setAttribute('cx', 120 + 92 * Math.cos(a));
     node.setAttribute('cy', 120 + 92 * Math.sin(a));
@@ -509,7 +509,7 @@ function initFlywheel() {
     } catch (_) { /* private mode — still fire once per session */ }
     // Add pulse ring around the FIRST lock's node position.
     const first = LOCKS[0];
-    const angle = (-90 + 0 * 90) * Math.PI / 180;
+    const angle = (-90 + 0 * 120) * Math.PI / 180;
     const cx = 120 + 92 * Math.cos(angle);
     const cy = 120 + 92 * Math.sin(angle);
     const ring = document.createElementNS(SVGNS, 'circle');
@@ -657,29 +657,22 @@ function initFlywheel() {
          user 2026-08-12); completion animates $0 → $100,000 with
          `Funded Trader` on the second line. Desktop keeps the original
          fraction / `Profitable Trader` language. */
-      if (isMobile) {
-        if (full) {
-          hv.textContent = '$0';
-        } else {
-          stopHubMoney();
-          hv.textContent = 'Financial License';
-        }
+      /* 2026-08-16: desktop now mirrors mobile - Financial License in the
+         hub pre-completion, animated money on completion. */
+      if (full) {
+        hv.textContent = '$0';
       } else {
         stopHubMoney();
-        hv.textContent = full ? 'Profitable' : (n + '/' + total);
+        hv.textContent = 'Financial License';
       }
       hv.classList.toggle('done', full);
-      hv.classList.toggle('hub-money', full && isMobile);
-      hv.classList.toggle('hub-license', !full && isMobile);
+      hv.classList.toggle('hub-money', full);
+      hv.classList.toggle('hub-license', !full);
     }
     if (hk) {
-      if (isMobile) {
-        hk.textContent = full ? 'Funded Trader' : '#460940 / AR1310836';
-      } else {
-        hk.textContent = full ? 'Trader' : 'Unlocked';
-      }
+      hk.textContent = full ? 'Funded Trader' : '#460940 / AR1310836';
       hk.classList.toggle('done', full);
-      hk.classList.toggle('hub-license-num', !full && isMobile);
+      hk.classList.toggle('hub-license-num', !full);
     }
     const cnt = $$$('#fly-count');
     const msg = $$$('#fly-msg');
@@ -693,12 +686,10 @@ function initFlywheel() {
     if (wrap) wrap.classList.toggle('all-open', full);
     /* Money render: on mobile, animate INSIDE the hub. On desktop,
        keep the original external card. */
-    if (full && isMobile) {
+    /* Always animate money inside the hub on completion (both breakpoints). */
+    if (full) {
       stopMoney();
       runHubMoney();
-    } else if (full) {
-      stopHubMoney();
-      runMoney();
     } else {
       stopMoney();
       stopHubMoney();
