@@ -439,7 +439,7 @@ const LOCKS = [
      ("A proven process backed by data."). Wheel is now three thirds
      instead of four quarters (SEG = CIRC / 3, rotate every 120deg). */
   { id: 'systems',  label: 'Systems',  hue: GRN, pain: 'No defined edge',       fix: 'A proven process backed by data.' },
-  { id: 'software', label: 'Software', hue: GRN, pain: 'Trading blind',         fix: 'MMT-Algo scanning the markets.' },
+  { id: 'software', label: 'Software', hue: GRN, pain: 'Missing opportunities', fix: 'Proprietary software scanning markets 24/7.' },
   { id: 'support',  label: 'Support',  hue: GRN, pain: 'Figuring it out alone', fix: '<span class="d-desktop">Live sessions with <a class="lock-link" href="https://service.asic.gov.au/search/RepresentativeDetail?PermissionType=Australian%20financial%20services%20authorised%20representatives&RepNumber=001310836" target="_blank" rel="noopener">authorised advisors</a> every 48 hours.</span><span class="d-mobile">Live sessions every 48 hours.</span>' },
 ];
 
