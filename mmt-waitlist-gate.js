@@ -256,6 +256,17 @@
     '</footer>'
   ].join('');
 
+  /* ---------- MARKET TICKER DATA (hoisted before mount) ---------- */
+  var TICKER_ITEMS = [
+    { label: 'S&P 500', price: '7,591.70', change: '-0.58%', dir: 'down' },
+    { label: 'NASDAQ',  price: '26,081.73', change: '-0.65%', dir: 'down' },
+    { label: 'DOW',     price: '52,064.10', change: '-0.60%', dir: 'down' },
+    { label: 'BTC',     price: '$76,776',   change: '-1.98%', dir: 'down' },
+    { label: 'ETH',     price: '$2,443',    change: '-1.24%', dir: 'down' },
+    { label: 'ASX 200', price: '8,872.40',  change: '+0.22%', dir: 'up'   },
+    { label: 'GOLD',    price: '$3,614',    change: '+0.41%', dir: 'up'   }
+  ];
+
   /* ---------- MOUNT ---------- */
   function mount() {
     if (document.getElementById('mmt-router-root')) return;
@@ -338,16 +349,6 @@
   }
 
   /* ---------- MARKET TICKER ---------- */
-  var TICKER_ITEMS = [
-    { label: 'S&P 500', price: '7,591.70', change: '-0.58%', dir: 'down' },
-    { label: 'NASDAQ',  price: '26,081.73', change: '-0.65%', dir: 'down' },
-    { label: 'DOW',     price: '52,064.10', change: '-0.60%', dir: 'down' },
-    { label: 'BTC',     price: '$76,776',   change: '-1.98%', dir: 'down' },
-    { label: 'ETH',     price: '$2,443',    change: '-1.24%', dir: 'down' },
-    { label: 'ASX 200', price: '8,872.40',  change: '+0.22%', dir: 'up'   },
-    { label: 'GOLD',    price: '$3,614',    change: '+0.41%', dir: 'up'   }
-  ];
-
   function renderTicker() {
     var track = root.querySelector('#mmt-marketTicker');
     if (!track) return;
