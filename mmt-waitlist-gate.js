@@ -288,10 +288,10 @@
 
   /* ---------- BEHAVIOUR ---------- */
   var DESTINATIONS = {
-    '/business':    'https://mmt-business-owners.pplx.app',
-    '/fifo':        'https://mmt-tradies.pplx.app',
-    '/tradie':      'https://mmt-tradies.pplx.app',
-    '/high-income': 'https://mmt-high-income-earners.pplx.app'
+    '/business':    'https://owners.makemoney.com.au',
+    '/fifo':        'https://trades.makemoney.com.au',
+    '/tradie':      'https://trades.makemoney.com.au',
+    '/high-income': 'https://earners.makemoney.com.au'
   };
 
   function showStep(el) {
