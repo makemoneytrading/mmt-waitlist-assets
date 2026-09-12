@@ -23,6 +23,40 @@
     document.documentElement.classList.add('mmt-hp3-prep');
   })();
 
+  /* ---- VIEWPORT + WIX SHELL OVERRIDE ----
+     Wix injects `<meta name="viewport" content="width=320, user-scalable=yes">` and
+     locks html/body to `width:320px` with `.device-mobile-optimized`. Fix both so
+     the layout uses the real device width. */
+  (function () {
+    var wanted = 'width=device-width, initial-scale=1, viewport-fit=cover';
+    function fixViewport() {
+      var metas = document.querySelectorAll('meta[name="viewport"]');
+      if (metas.length === 0) {
+        var m = document.createElement('meta');
+        m.name = 'viewport';
+        m.content = wanted;
+        document.head.appendChild(m);
+      } else {
+        metas.forEach(function (m, i) {
+          if (i === 0) m.setAttribute('content', wanted);
+          else m.parentNode && m.parentNode.removeChild(m);
+        });
+      }
+    }
+    fixViewport();
+    // Wix may re-inject its viewport after load; re-fix on DOMContentLoaded and load.
+    document.addEventListener('DOMContentLoaded', fixViewport, { once: true });
+    window.addEventListener('load', fixViewport, { once: true });
+    // Also add a style that unlocks Wix's mobile-optimized width lock.
+    var s = document.createElement('style');
+    s.id = 'mmt-hp3-shell-fix';
+    s.textContent =
+      'html,body{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important;overflow-x:hidden!important}' +
+      'body.device-mobile-optimized,body.device-mobile-non-optimized{width:100%!important}' +
+      '#mmt-hp3-root{width:100%!important;max-width:100%!important;overflow-x:hidden}';
+    document.head.appendChild(s);
+  })();
+
   /* ---- HEAD: fonts, wistia, meta ---- */
   function addLink(rel, href, cross) {
     var l = document.createElement('link');
