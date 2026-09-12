@@ -37,6 +37,11 @@
   addLink('preconnect', 'https://fonts.gstatic.com', true);
   addLink('stylesheet', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Anton&display=swap');
 
+  var wistiaPlayerLib = document.createElement('script');
+  wistiaPlayerLib.src = 'https://fast.wistia.com/player.js';
+  wistiaPlayerLib.async = true;
+  document.head.appendChild(wistiaPlayerLib);
+
   var wistiaScript = document.createElement('script');
   wistiaScript.src = 'https://fast.wistia.com/embed/rd7d652xeu.js';
   wistiaScript.async = true;
