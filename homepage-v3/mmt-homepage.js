@@ -24,58 +24,56 @@
   })();
 
   /* ---- VIEWPORT + WIX SHELL OVERRIDE ----
-     Wix serves the page with `<meta id="wixMobileViewport" name="viewport" content="width=320, ...">`
-     and locks html/body to width:320px via .device-mobile-optimized. Undo both so the
-     layout uses the real device width. */
+     Wix serves this page with <meta id="wixMobileViewport" name="viewport" content="width=320, ...">
+     and .device-mobile-optimized on body, both of which lock the layout to 320px on mobile.
+     Fix: DELETE Wix's meta and INSERT our own fresh one (in-place setAttribute doesn't relayout
+     on iOS Safari), strip the body class, and add CSS that unlocks any residual width lock.
+     Bounded retries with a flag — no MutationObserver loop. */
   (function () {
-    var wanted = 'width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes';
-    function fixViewport() {
+    var wanted = 'width=device-width, initial-scale=1, viewport-fit=cover';
+    function replaceViewport() {
+      // Remove ALL existing viewport metas (Wix's + any duplicates)
       var metas = document.querySelectorAll('meta[name="viewport"]');
-      metas.forEach(function (m, i) {
-        if (i === 0) {
-          if (m.getAttribute('content') !== wanted) m.setAttribute('content', wanted);
-        } else {
-          m.parentNode && m.parentNode.removeChild(m);
-        }
-      });
-      if (metas.length === 0) {
-        var m2 = document.createElement('meta');
-        m2.name = 'viewport';
-        m2.setAttribute('content', wanted);
-        document.head.appendChild(m2);
+      for (var i = 0; i < metas.length; i++) {
+        if (metas[i].parentNode) metas[i].parentNode.removeChild(metas[i]);
       }
+      // Insert a fresh one — this triggers iOS to recompute layout viewport
+      var m = document.createElement('meta');
+      m.name = 'viewport';
+      m.setAttribute('content', wanted);
+      m.setAttribute('data-mmt-viewport', '1');
+      document.head.appendChild(m);
     }
-    // Also strip the .device-mobile-optimized class Wix uses to lock body width.
     function fixBodyClass() {
-      if (document.body) {
-        if (document.body.classList.contains('device-mobile-optimized')) document.body.classList.remove('device-mobile-optimized');
-        if (document.body.classList.contains('device-mobile-non-optimized')) document.body.classList.remove('device-mobile-non-optimized');
-        if (!document.body.classList.contains('mmt-hp3-body')) document.body.classList.add('mmt-hp3-body');
-      }
+      if (!document.body) return;
+      document.body.classList.remove('device-mobile-optimized');
+      document.body.classList.remove('device-mobile-non-optimized');
+      document.body.classList.add('mmt-hp3-body');
     }
-    // MutationObserver — guarded so our own writes do not re-trigger it.
-    var writing = false;
-    function guard(fn) {
-      if (writing) return;
-      writing = true;
-      try { fn(); } finally { setTimeout(function(){ writing = false; }, 0); }
+    // Run once immediately.
+    replaceViewport();
+    fixBodyClass();
+    // Re-run at DOMContentLoaded and load in case Wix's runtime re-inserts.
+    document.addEventListener('DOMContentLoaded', function () { replaceViewport(); fixBodyClass(); }, { once: true });
+    window.addEventListener('load', function () { replaceViewport(); fixBodyClass(); }, { once: true });
+    // Bounded polling for 3s after load to catch any late Wix re-insertion.
+    var pollStart = 0;
+    var pollInterval = null;
+    function startPoll() {
+      pollStart = Date.now();
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(function () {
+        if (Date.now() - pollStart > 3000) { clearInterval(pollInterval); return; }
+        var current = document.querySelector('meta[name="viewport"]');
+        if (!current || current.getAttribute('content') !== wanted || !current.hasAttribute('data-mmt-viewport')) {
+          replaceViewport();
+        }
+        fixBodyClass();
+      }, 250);
     }
-    guard(function(){ fixViewport(); fixBodyClass(); });
-    try {
-      var mo = new MutationObserver(function () { guard(function(){ fixViewport(); fixBodyClass(); }); });
-      mo.observe(document.head, { childList: true, subtree: false, attributes: true, attributeFilter: ['content'] });
-      if (document.body) {
-        mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-      } else {
-        document.addEventListener('DOMContentLoaded', function () {
-          guard(function(){ fixBodyClass(); });
-          mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-        }, { once: true });
-      }
-    } catch (e) {}
-    document.addEventListener('DOMContentLoaded', function () { guard(function(){ fixViewport(); fixBodyClass(); }); }, { once: true });
-    window.addEventListener('load', function () { guard(function(){ fixViewport(); fixBodyClass(); }); }, { once: true });
-    // Style that unlocks Wix's mobile-optimized width lock.
+    document.addEventListener('DOMContentLoaded', startPoll, { once: true });
+
+    // CSS unlock — belt and suspenders.
     var s = document.createElement('style');
     s.id = 'mmt-hp3-shell-fix';
     s.textContent =
