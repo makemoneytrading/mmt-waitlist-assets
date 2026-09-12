@@ -45,25 +45,36 @@
         document.head.appendChild(m2);
       }
     }
-    fixViewport();
     // Also strip the .device-mobile-optimized class Wix uses to lock body width.
     function fixBodyClass() {
       if (document.body) {
-        document.body.classList.remove('device-mobile-optimized');
-        document.body.classList.remove('device-mobile-non-optimized');
-        document.body.classList.add('mmt-hp3-body');
+        if (document.body.classList.contains('device-mobile-optimized')) document.body.classList.remove('device-mobile-optimized');
+        if (document.body.classList.contains('device-mobile-non-optimized')) document.body.classList.remove('device-mobile-non-optimized');
+        if (!document.body.classList.contains('mmt-hp3-body')) document.body.classList.add('mmt-hp3-body');
       }
     }
-    fixBodyClass();
-    // Wix may re-inject/toggle these after our script runs; watch head and body.
+    // MutationObserver — guarded so our own writes do not re-trigger it.
+    var writing = false;
+    function guard(fn) {
+      if (writing) return;
+      writing = true;
+      try { fn(); } finally { setTimeout(function(){ writing = false; }, 0); }
+    }
+    guard(function(){ fixViewport(); fixBodyClass(); });
     try {
-      var mo = new MutationObserver(function () { fixViewport(); fixBodyClass(); });
-      mo.observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
-      if (document.body) mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-      else document.addEventListener('DOMContentLoaded', function () { fixBodyClass(); mo.observe(document.body, { attributes: true, attributeFilter: ['class'] }); }, { once: true });
+      var mo = new MutationObserver(function () { guard(function(){ fixViewport(); fixBodyClass(); }); });
+      mo.observe(document.head, { childList: true, subtree: false, attributes: true, attributeFilter: ['content'] });
+      if (document.body) {
+        mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      } else {
+        document.addEventListener('DOMContentLoaded', function () {
+          guard(function(){ fixBodyClass(); });
+          mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        }, { once: true });
+      }
     } catch (e) {}
-    document.addEventListener('DOMContentLoaded', function () { fixViewport(); fixBodyClass(); }, { once: true });
-    window.addEventListener('load', function () { fixViewport(); fixBodyClass(); }, { once: true });
+    document.addEventListener('DOMContentLoaded', function () { guard(function(){ fixViewport(); fixBodyClass(); }); }, { once: true });
+    window.addEventListener('load', function () { guard(function(){ fixViewport(); fixBodyClass(); }); }, { once: true });
     // Style that unlocks Wix's mobile-optimized width lock.
     var s = document.createElement('style');
     s.id = 'mmt-hp3-shell-fix';
