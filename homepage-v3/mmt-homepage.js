@@ -24,36 +24,53 @@
   })();
 
   /* ---- VIEWPORT + WIX SHELL OVERRIDE ----
-     Wix injects `<meta name="viewport" content="width=320, user-scalable=yes">` and
-     locks html/body to `width:320px` with `.device-mobile-optimized`. Fix both so
-     the layout uses the real device width. */
+     Wix serves the page with `<meta id="wixMobileViewport" name="viewport" content="width=320, ...">`
+     and locks html/body to width:320px via .device-mobile-optimized. Undo both so the
+     layout uses the real device width. */
   (function () {
-    var wanted = 'width=device-width, initial-scale=1, viewport-fit=cover';
+    var wanted = 'width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes';
     function fixViewport() {
       var metas = document.querySelectorAll('meta[name="viewport"]');
+      metas.forEach(function (m, i) {
+        if (i === 0) {
+          if (m.getAttribute('content') !== wanted) m.setAttribute('content', wanted);
+        } else {
+          m.parentNode && m.parentNode.removeChild(m);
+        }
+      });
       if (metas.length === 0) {
-        var m = document.createElement('meta');
-        m.name = 'viewport';
-        m.content = wanted;
-        document.head.appendChild(m);
-      } else {
-        metas.forEach(function (m, i) {
-          if (i === 0) m.setAttribute('content', wanted);
-          else m.parentNode && m.parentNode.removeChild(m);
-        });
+        var m2 = document.createElement('meta');
+        m2.name = 'viewport';
+        m2.setAttribute('content', wanted);
+        document.head.appendChild(m2);
       }
     }
     fixViewport();
-    // Wix may re-inject its viewport after load; re-fix on DOMContentLoaded and load.
-    document.addEventListener('DOMContentLoaded', fixViewport, { once: true });
-    window.addEventListener('load', fixViewport, { once: true });
-    // Also add a style that unlocks Wix's mobile-optimized width lock.
+    // Also strip the .device-mobile-optimized class Wix uses to lock body width.
+    function fixBodyClass() {
+      if (document.body) {
+        document.body.classList.remove('device-mobile-optimized');
+        document.body.classList.remove('device-mobile-non-optimized');
+        document.body.classList.add('mmt-hp3-body');
+      }
+    }
+    fixBodyClass();
+    // Wix may re-inject/toggle these after our script runs; watch head and body.
+    try {
+      var mo = new MutationObserver(function () { fixViewport(); fixBodyClass(); });
+      mo.observe(document.head, { childList: true, subtree: true, attributes: true, attributeFilter: ['content'] });
+      if (document.body) mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      else document.addEventListener('DOMContentLoaded', function () { fixBodyClass(); mo.observe(document.body, { attributes: true, attributeFilter: ['class'] }); }, { once: true });
+    } catch (e) {}
+    document.addEventListener('DOMContentLoaded', function () { fixViewport(); fixBodyClass(); }, { once: true });
+    window.addEventListener('load', function () { fixViewport(); fixBodyClass(); }, { once: true });
+    // Style that unlocks Wix's mobile-optimized width lock.
     var s = document.createElement('style');
     s.id = 'mmt-hp3-shell-fix';
     s.textContent =
-      'html,body{width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important;overflow-x:hidden!important}' +
-      'body.device-mobile-optimized,body.device-mobile-non-optimized{width:100%!important}' +
-      '#mmt-hp3-root{width:100%!important;max-width:100%!important;overflow-x:hidden}';
+      'html,body{width:100%!important;max-width:100vw!important;min-width:0!important;margin:0!important;padding:0!important;overflow-x:hidden!important}' +
+      'body.device-mobile-optimized,body.device-mobile-non-optimized,body.mmt-hp3-body{width:100%!important;max-width:100vw!important}' +
+      '#mmt-hp3-root{width:100%!important;max-width:100vw!important;overflow-x:hidden}';
     document.head.appendChild(s);
   })();
 
