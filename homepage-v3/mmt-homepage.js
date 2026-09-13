@@ -138,7 +138,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   if (!el) return;
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var m = months[new Date().getMonth()];
-  el.textContent = m + ' cohort closing soon. Apply now.';
+  el.textContent = m + ' cohort closing soon.';
 })();
 
 // Video testimonials — ordered: biggest results first (4), then alternated to break color clustering
@@ -382,6 +382,8 @@ function _wireInput(el, onChange){
   lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lb.hidden) close(); });
 })();
+
+
 
 
 
