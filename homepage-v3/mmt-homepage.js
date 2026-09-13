@@ -431,7 +431,9 @@ function _wireInput(el, onChange){
       track.style.setProperty('--cw-delay', (-r * 3.1) + 's');
       var eager = r < eagerRows;
       seq.forEach(function (c) { track.appendChild(tile(c, eager, false)); });
-      seq.forEach(function (c) { track.appendChild(tile(c, false, true)); });
+      // Duplicate row for the marquee loop — eager-load matches the primary
+      // row so tiles are ready before they scroll into view (no flicker/blank).
+      seq.forEach(function (c) { track.appendChild(tile(c, eager, true)); });
       row.appendChild(track);
       g.appendChild(row);
     }
@@ -475,6 +477,8 @@ function _wireInput(el, onChange){
   lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lb.hidden) close(); });
 })();
+
+
 
 
 
