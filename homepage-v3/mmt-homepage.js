@@ -170,7 +170,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     art.className = 'vcard';
     art.innerHTML =
       '<button class="vplay" type="button" data-yt="' + v.id + '" aria-label="Play video: ' + v.title.replace(/"/g,'&quot;') + '">'+
-        '<img src="assets/stories/' + v.id + '.webp" alt="" loading="lazy" width="960" height="540" />'+
+        '<img src="' + CDN_LOCAL + 'assets/stories/' + v.id + '.webp" alt="" loading="lazy" width="960" height="540" />'+
         '<span class="vbadge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>'+
       '</button>'+
       '<p class="vtitle">' + v.title + '</p>';
@@ -282,10 +282,10 @@ function _wireInput(el, onChange){
   if (!wall) return;
   var pad = function (i) { return String(i + 1).padStart(2, '0'); };
   var payouts = Array.from({ length: 15 }, function (_, i) {
-    return { src: 'assets/payouts/p' + pad(i) + '.webp', label: 'Payout certificate ' + pad(i), paid: true };
+    return { src: CDN_LOCAL + 'assets/payouts/p' + pad(i) + '.webp', label: 'Payout certificate ' + pad(i), paid: true };
   });
   var certs = Array.from({ length: 56 }, function (_, i) {
-    return { src: 'assets/certs/c' + pad(i) + '.webp', label: 'Funded trader certificate ' + pad(i) };
+    return { src: CDN_LOCAL + 'assets/certs/c' + pad(i) + '.webp', label: 'Funded trader certificate ' + pad(i) };
   });
 
   // Lightbox for enlarging a cert (in-memory, no dialog API)
@@ -382,6 +382,8 @@ function _wireInput(el, onChange){
   lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lb.hidden) close(); });
 })();
+
+
 
 
 
