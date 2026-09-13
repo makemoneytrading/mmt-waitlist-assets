@@ -252,17 +252,98 @@ function _wireInput(el, onChange){
   compute();
 })();
 
-// Countdown — rolling 3-day window (in-memory only; resets on reload)
+// Countdown — expires 5pm AEST on the 3rd business day after first visit.
+// First-visit timestamp is persisted in localStorage so the deadline is stable
+// across reloads and return visits. Rolls forward once the previous window ends.
 (function(){
-  var target = Date.now() + 3 * 24 * 60 * 60 * 1000; // 3 days
+  var STORAGE_KEY = 'mmt_hp3_deadline_v1';
   var elD = document.getElementById('cd-d');
   var elH = document.getElementById('cd-h');
   var elM = document.getElementById('cd-m');
   var elS = document.getElementById('cd-s');
+  if (!elD || !elH || !elM || !elS) return;
+
+  // Sydney timezone offset (AEST +10 / AEDT +11) — resolved from a real Date via Intl.
+  function sydneyOffsetMs(date){
+    // toLocaleString drops timezone; we compare the Sydney wall time to UTC.
+    var syd = new Date(date.toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+    var utc = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+    return syd.getTime() - utc.getTime();
+  }
+
+  // Build a UTC epoch for 5pm Sydney local time on a given Sydney calendar date.
+  function sydney5pmEpoch(sydY, sydM, sydD){
+    // Start from a UTC guess at that Sydney wall-clock instant, then correct for tz.
+    var guess = Date.UTC(sydY, sydM, sydD, 17, 0, 0);
+    var off = sydneyOffsetMs(new Date(guess));
+    return guess - off;
+  }
+
+  // Sydney calendar parts for a given epoch.
+  function sydneyParts(epoch){
+    var s = new Date(epoch).toLocaleString('en-US', {
+      timeZone: 'Australia/Sydney',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+    // Format: MM/DD/YYYY, HH:MM
+    var m = s.match(/(\d{2})\/(\d{2})\/(\d{4}),?\s+(\d{2}):(\d{2})/);
+    return {
+      y: +m[3], mo: +m[1] - 1, d: +m[2], h: +m[4], mi: +m[5]
+    };
+  }
+
+  function isWeekend(sydY, sydMo, sydD){
+    // Use noon-Sydney to sidestep DST edges when reading day-of-week.
+    var epoch = sydney5pmEpoch(sydY, sydMo, sydD) - 5 * 3600 * 1000; // noon Sydney
+    var wd = new Date(epoch).toLocaleString('en-US', { timeZone: 'Australia/Sydney', weekday: 'short' });
+    return wd === 'Sat' || wd === 'Sun';
+  }
+
+  function addOneDay(sydY, sydMo, sydD){
+    // Bump via UTC arithmetic then re-read Sydney parts.
+    var e = Date.UTC(sydY, sydMo, sydD, 12, 0, 0) + 24 * 3600 * 1000;
+    var t = new Date(e);
+    return { y: t.getUTCFullYear(), mo: t.getUTCMonth(), d: t.getUTCDate() };
+  }
+
+  // Return the epoch for 5pm on the 3rd business day AFTER `from`.
+  // Sat/Sun are skipped when counting. Business day boundary is Sydney date.
+  function deadlineFrom(fromEpoch){
+    var p = sydneyParts(fromEpoch);
+    var y = p.y, mo = p.mo, d = p.d;
+    var counted = 0;
+    while (counted < 3){
+      var next = addOneDay(y, mo, d);
+      y = next.y; mo = next.mo; d = next.d;
+      if (!isWeekend(y, mo, d)) counted++;
+    }
+    return sydney5pmEpoch(y, mo, d);
+  }
+
+  function loadOrSetDeadline(){
+    var now = Date.now();
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    var deadline = raw ? parseInt(raw, 10) : NaN;
+    // Invalid or already expired -> start a new window from now.
+    if (!deadline || isNaN(deadline) || deadline <= now){
+      deadline = deadlineFrom(now);
+      try { localStorage.setItem(STORAGE_KEY, String(deadline)); } catch(e){}
+    }
+    return deadline;
+  }
+
+  var target = loadOrSetDeadline();
   function pad(n){ return n < 10 ? '0' + n : String(n); }
   function tick(){
     var d = target - Date.now();
-    if (d < 0) d = 0;
+    if (d <= 0){
+      // Window expired -> start a new one anchored at the moment it ran out.
+      target = deadlineFrom(Date.now());
+      try { localStorage.setItem(STORAGE_KEY, String(target)); } catch(e){}
+      d = target - Date.now();
+    }
     var s = Math.floor(d/1000);
     var days = Math.floor(s/86400); s -= days*86400;
     var hrs = Math.floor(s/3600); s -= hrs*3600;
@@ -382,6 +463,8 @@ function _wireInput(el, onChange){
   lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lb.hidden) close(); });
 })();
+
+
 
 
 
