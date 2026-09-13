@@ -441,8 +441,11 @@ function _wireInput(el, onChange){
   }
 
   wall.innerHTML = '';
+  // Eager-load the first payout row + the first cert row only. All other rows
+  // lazy-load, which spares the browser from opening 100+ parallel requests to
+  // a cold jsdelivr edge (which triggers aborts and flashing empty tiles).
   wall.appendChild(buildGroup(payouts, 1, 1));
-  wall.appendChild(buildGroup(certs, 7, 2));
+  wall.appendChild(buildGroup(certs, 7, 1));
 
   // Wire Best-Results shots to the same lightbox
   document.querySelectorAll('.shotb').forEach(function (b) {
@@ -477,6 +480,8 @@ function _wireInput(el, onChange){
   lb.addEventListener('click', function(e){ if (e.target === lb) close(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lb.hidden) close(); });
 })();
+
+
 
 
 
