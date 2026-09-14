@@ -9,7 +9,7 @@
   if (p !== '/' && p !== '/home' && p !== '') return;
   if (document.getElementById('mmt-hp3-root')) return;
 
-  var CDN = 'https://cdn.jsdelivr.net/gh/makemoneytrading/mmt-waitlist-assets@9af53d09419e6958e4d79af845f64d5432600cff/homepage-v3/';
+  var CDN = 'https://cdn.jsdelivr.net/gh/makemoneytrading/mmt-waitlist-assets@2bc5a3cd61cf41adc2d5645dffce9f988ea7e6b2/homepage-v3/';
 
   /* ---- TYPEFORM EMBED (loaded once) ---- */
   (function () {
