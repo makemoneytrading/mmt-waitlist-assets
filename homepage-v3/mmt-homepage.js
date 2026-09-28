@@ -168,7 +168,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     { id: 'r368ar02ie8', title: '$150K on two degrees. 30 days of MMT made him more money.' },
     { id: 'fOKhUgSqEbg', title: 'Dyslexic FIFO worker learns to trade in 30 days' },
     // Remaining 10 — alternated to break thumbnail-color clustering
-    { id: 'U8E1Ehel-eo', title: 'Ryan doubled his account within 6 months' },
+    { id: 'aHhd2KZDCqA', title: 'Kyle made $180,000 in 30 days', thumbnail: 'https://i.ytimg.com/vi/aHhd2KZDCqA/maxresdefault.jpg' },
     { id: 'gbsFHFZ4oQ4', title: 'No computer for 14 years. Replaced his income in 14 weeks.' },
     { id: 'ySooVMJtTBk', title: 'FIFO worker, 7 trades, 1 loss, $20K profit' },
     { id: 'cr7BMjsIkSs', title: 'He spent 6 months vetting us. His only criticism, too easy.' },
@@ -185,7 +185,7 @@ document.getElementById('yr').textContent = new Date().getFullYear();
     art.className = 'vcard';
     art.innerHTML =
       '<button class="vplay" type="button" data-yt="' + v.id + '" aria-label="Play video: ' + v.title.replace(/"/g,'&quot;') + '">'+
-        '<img src="' + CDN_LOCAL + 'assets/stories/' + v.id + '.webp" alt="" loading="lazy" width="960" height="540" />'+
+        '<img src="' + (v.thumbnail || CDN_LOCAL + 'assets/stories/' + v.id + '.webp') + '" alt="" loading="lazy" width="960" height="540" />'+
         '<span class="vbadge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>'+
       '</button>'+
       '<p class="vtitle">' + v.title + '</p>';
