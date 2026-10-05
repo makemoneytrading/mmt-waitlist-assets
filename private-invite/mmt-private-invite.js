@@ -81,7 +81,7 @@
         '<a class="pi-lic" href="https://service.asic.gov.au/search/RepresentativeDetail?PermissionType=Australian%20financial%20services%20authorised%20representatives&amp;RepNumber=001310836" target="_blank" rel="noopener noreferrer" aria-label="Verify our Financial Services Licence on the ASIC register"><span class="pi-lic-k">Financial Services Licence</span><span class="pi-lic-v">AFSL #460940 / AR #1310836</span></a>' +
       '</div></header>' +
       '<main class="pi-main"><div class="pi-in">' +
-        '<h1 class="pi-title">Private Video<br><span class="hl">Watch Now</span></h1>' +
+        '<h1 class="pi-title">Private <span class="hl">Video</span></h1>' +
         '<div class="pi-frame"><wistia-player media-id="rd7d652xeu" aspect="1.7777777777777777"></wistia-player></div>' +
         '<p class="pi-note">Watch this video then jump back into our chat and let me know you have any questions \uD83D\uDCAA</p>' +
       '</div></main>' +
