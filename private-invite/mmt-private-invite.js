@@ -51,7 +51,9 @@
     '.pi-hdr{position:relative;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(10,10,10,.85)}',
     '.pi-hdr-in{max-width:1280px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}',
     '.pi-logo{height:38px;width:auto;display:block}',
-    '.pi-lic{text-align:right;line-height:1.2}',
+    '.pi-lic{text-align:right;line-height:1.2;color:inherit;text-decoration:none;display:inline-block;transition:opacity .15s ease}',
+    '.pi-lic:hover,.pi-lic:focus-visible{opacity:.85}',
+    '.pi-lic:focus-visible{outline:2px solid #FF6B1A;outline-offset:3px;border-radius:4px}',
     '.pi-lic-k{display:block;font-size:10px;color:#8a8880;letter-spacing:.14em;text-transform:uppercase}',
     '.pi-lic-v{display:block;font-size:12px;color:#c7c5c0;font-weight:600;margin-top:2px}',
     '.pi-main{position:relative;flex:1;padding:56px 24px 72px;text-align:center}',
@@ -76,14 +78,14 @@
     root.innerHTML =
       '<header class="pi-hdr"><div class="pi-hdr-in">' +
         '<img class="pi-logo" src="' + LOGO + '" alt="Make Money Team" width="140" height="52">' +
-        '<div class="pi-lic"><span class="pi-lic-k">Financial Services Licence</span><span class="pi-lic-v">AFSL #460940 / AR #1310836</span></div>' +
+        '<a class="pi-lic" href="https://service.asic.gov.au/search/RepresentativeDetail?PermissionType=Australian%20financial%20services%20authorised%20representatives&amp;RepNumber=001310836" target="_blank" rel="noopener noreferrer" aria-label="Verify our Financial Services Licence on the ASIC register"><span class="pi-lic-k">Financial Services Licence</span><span class="pi-lic-v">AFSL #460940 / AR #1310836</span></a>' +
       '</div></header>' +
       '<main class="pi-main"><div class="pi-in">' +
         '<h1 class="pi-title">Private Video<br><span class="hl">Watch Now</span></h1>' +
         '<div class="pi-frame"><wistia-player media-id="rd7d652xeu" aspect="1.7777777777777777"></wistia-player></div>' +
         '<p class="pi-note">Watch this video then jump back into our chat and let me know you have any questions \uD83D\uDCAA</p>' +
       '</div></main>' +
-      '<footer class="pi-ftr">MW Education Pty Ltd t/a Make Money Trading is a Corporate Authorised Representative (#1310836) of AFSL #460940. Any advice is general in nature only and does not take into account your objectives, financial situation or needs. Trading involves risk.</footer>';
+      '';
     document.body.appendChild(root);
     document.title = 'Private Video | Make Money Team';
     fixViewport();
