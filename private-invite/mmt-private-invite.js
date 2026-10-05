@@ -64,9 +64,9 @@
     '.pi-frame{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#000;border:2px solid #FF6B1A;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 0 8px rgba(255,107,26,.08),0 0 60px rgba(255,107,26,.2)}',
     '.pi-frame wistia-player{display:block;width:100%;height:100%}',
     "wistia-player[media-id='rd7d652xeu']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/rd7d652xeu/swatch');display:block;filter:blur(5px);padding-top:56.25%}",
-    '.pi-note{margin:32px auto 0;max-width:720px;font-size:clamp(18px,2.2vw,24px);font-weight:700;line-height:1.4;color:#f7f7f5}',
+    '.pi-note{margin:0 auto 32px;max-width:720px;font-size:clamp(18px,2.2vw,24px);font-weight:700;line-height:1.4;color:#f7f7f5}',
     '.pi-ftr{position:relative;border-top:1px solid rgba(255,255,255,.08);padding:24px;text-align:center;font-size:11px;color:#8a8880;line-height:1.6}',
-    '@media(max-width:640px){.pi-hdr-in{padding:12px 16px}.pi-logo{height:30px}.pi-lic-k{font-size:9px}.pi-lic-v{font-size:11px}.pi-main{padding:36px 16px 48px}.pi-title{font-size:13vw;margin-bottom:24px}.pi-frame{border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 5px rgba(255,107,26,.08),0 0 40px rgba(255,107,26,.18)}.pi-note{margin-top:24px;font-size:18px}}'
+    '@media(max-width:640px){.pi-hdr-in{padding:12px 16px}.pi-logo{height:30px}.pi-lic-k{font-size:9px}.pi-lic-v{font-size:11px}.pi-main{padding:36px 16px 48px}.pi-title{font-size:13vw;margin-bottom:24px}.pi-frame{border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 5px rgba(255,107,26,.08),0 0 40px rgba(255,107,26,.18)}.pi-note{margin:0 auto 24px;font-size:18px}}'
   ].join('');
   document.head.appendChild(css);
 
@@ -76,14 +76,9 @@
     var root = document.createElement('div');
     root.id = 'mmt-pi-root';
     root.innerHTML =
-      '<header class="pi-hdr"><div class="pi-hdr-in">' +
-        '<img class="pi-logo" src="' + LOGO + '" alt="Make Money Team" width="140" height="52">' +
-        '<a class="pi-lic" href="https://service.asic.gov.au/search/RepresentativeDetail?PermissionType=Australian%20financial%20services%20authorised%20representatives&amp;RepNumber=001310836" target="_blank" rel="noopener noreferrer" aria-label="Verify our Financial Services Licence on the ASIC register"><span class="pi-lic-k">Financial Services Licence</span><span class="pi-lic-v">AFSL #460940 / AR #1310836</span></a>' +
-      '</div></header>' +
       '<main class="pi-main"><div class="pi-in">' +
-        '<h1 class="pi-title">Private <span class="hl">Video</span></h1>' +
-        '<div class="pi-frame"><wistia-player media-id="rd7d652xeu" aspect="1.7777777777777777"></wistia-player></div>' +
         '<p class="pi-note">Watch this video then jump back into our chat and let me know you have any questions \uD83D\uDCAA</p>' +
+        '<div class="pi-frame"><wistia-player media-id="rd7d652xeu" aspect="1.7777777777777777"></wistia-player></div>' +
       '</div></main>' +
       '';
     document.body.appendChild(root);
