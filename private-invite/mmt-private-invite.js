@@ -56,7 +56,7 @@
     '.pi-lic:focus-visible{outline:2px solid #FF6B1A;outline-offset:3px;border-radius:4px}',
     '.pi-lic-k{display:block;font-size:10px;color:#8a8880;letter-spacing:.14em;text-transform:uppercase}',
     '.pi-lic-v{display:block;font-size:12px;color:#c7c5c0;font-weight:600;margin-top:2px}',
-    '.pi-main{position:relative;flex:1;padding:56px 24px 72px;text-align:center}',
+    '.pi-main{position:relative;flex:1;padding:clamp(80px,14vh,160px) 24px 72px;text-align:center}',
     '.pi-in{max-width:1000px;margin:0 auto}',
     '.pi-eyebrow{display:inline-block;margin:0 0 18px;padding:8px 16px;border:1px solid rgba(255,107,26,.45);border-radius:999px;background:rgba(255,107,26,.08);color:#FF6B1A;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}',
     '.pi-title{margin:0 0 36px;font-family:Anton,Inter,sans-serif;font-weight:400;line-height:.95;letter-spacing:-.01em;text-transform:uppercase;font-size:clamp(44px,7.5vw,104px);color:#f7f7f5;text-shadow:0 6px 40px rgba(0,0,0,.6)}',
@@ -66,7 +66,7 @@
     "wistia-player[media-id='rd7d652xeu']:not(:defined){background:center / contain no-repeat url('https://fast.wistia.com/embed/medias/rd7d652xeu/swatch');display:block;filter:blur(5px);padding-top:56.25%}",
     '.pi-note{margin:0 auto 32px;max-width:720px;font-size:clamp(18px,2.2vw,24px);font-weight:700;line-height:1.4;color:#f7f7f5}',
     '.pi-ftr{position:relative;border-top:1px solid rgba(255,255,255,.08);padding:24px;text-align:center;font-size:11px;color:#8a8880;line-height:1.6}',
-    '@media(max-width:640px){.pi-hdr-in{padding:12px 16px}.pi-logo{height:30px}.pi-lic-k{font-size:9px}.pi-lic-v{font-size:11px}.pi-main{padding:36px 16px 48px}.pi-title{font-size:13vw;margin-bottom:24px}.pi-frame{border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 5px rgba(255,107,26,.08),0 0 40px rgba(255,107,26,.18)}.pi-note{margin:0 auto 24px;font-size:18px}}'
+    '@media(max-width:640px){.pi-hdr-in{padding:12px 16px}.pi-logo{height:30px}.pi-lic-k{font-size:9px}.pi-lic-v{font-size:11px}.pi-main{padding:clamp(56px,10vh,96px) 16px 48px}.pi-title{font-size:13vw;margin-bottom:24px}.pi-frame{border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 0 5px rgba(255,107,26,.08),0 0 40px rgba(255,107,26,.18)}.pi-note{margin:0 auto 24px;font-size:18px}}'
   ].join('');
   document.head.appendChild(css);
 
@@ -77,7 +77,7 @@
     root.id = 'mmt-pi-root';
     root.innerHTML =
       '<main class="pi-main"><div class="pi-in">' +
-        '<p class="pi-note">Watch this video then jump back into our chat and let me know you have any questions \uD83D\uDCAA</p>' +
+        '<p class="pi-note">Watch this video then jump back into our chat<br>and let me know you have any questions \uD83D\uDCAA</p>' +
         '<div class="pi-frame"><wistia-player media-id="rd7d652xeu" aspect="1.7777777777777777"></wistia-player></div>' +
       '</div></main>' +
       '';
