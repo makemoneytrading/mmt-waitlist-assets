@@ -153,10 +153,11 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   if (!h) return;
   var on = false;
   function upd(){
-    var s = (window.scrollY || document.documentElement.scrollTop) > 10;
+    var s = Math.max(window.scrollY || 0, document.documentElement.scrollTop || 0, document.body.scrollTop || 0) > 10;
     if (s !== on) { on = s; h.classList.toggle('show', s); }
   }
   window.addEventListener('scroll', upd, { passive: true });
+  document.addEventListener('scroll', upd, { passive: true, capture: true }); // Wix scrolls <body>
   upd();
 })();
 
