@@ -191,13 +191,13 @@ document.getElementById('yr').textContent = new Date().getFullYear();
       '<p class="vtitle">' + v.title + '</p>';
     return art;
   }
-  var CHAL = ['pIfWy-LvR8w','Jxrb0YBrhsk','WzfXfw73Pt0','64IglsflfPI','cFbIvjlWx20','FKcu3FUjOQc'];
+  var CHAL = ['pIfWy-LvR8w','Jxrb0YBrhsk','WzfXfw73Pt0','64IglsflfPI','L3xBTwqYYnE','FKcu3FUjOQc'];
   var fragTop = document.createDocumentFragment();
   var fragBot = document.createDocumentFragment();
   videos.forEach(function(v, i){
     if (i < 6) fragTop.appendChild(make(v));
-    else if (CHAL.indexOf(v.id) > -1) fragBot.appendChild(make(v));
   });
+  CHAL.forEach(function(id){ var v = videos.filter(function(x){ return x.id === id; })[0]; if (v) fragBot.appendChild(make(v)); });
   if (hostTop) hostTop.appendChild(fragTop);
   if (hostBot) hostBot.appendChild(fragBot);
 })();
