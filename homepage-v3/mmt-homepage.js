@@ -177,12 +177,12 @@ document.getElementById('yr').textContent = new Date().getFullYear();
   if (!hostTop && !hostBot) return;
   var videos = [
     // Featured 6 — order set by Mitch: Ryan, Kyle, Principal / 8 years, FIFO, Lambo guru
-    { id: 'ErrtrxNCFU0', title: '$25K to $1.2 million in 6 months, and he doesn\u2019t even trade New York' },
+    { id: 'ErrtrxNCFU0', title: 'Ryan made $1.2 million in 6 months' },
     { id: 'aHhd2KZDCqA', title: 'Kyle made $180,000 in 30 days', thumbnail: 'https://i.ytimg.com/vi/aHhd2KZDCqA/maxresdefault.jpg' },
     { id: 'zouE4p2cyB0', title: 'Principal gets 1,100% ROI in 6 months', thumbnail: 'https://i.ytimg.com/vi/zouE4p2cyB0/maxresdefault.jpg' },
-    { id: 'r368ar02ie8', title: '$150K on two degrees. 30 days of MMT made him more money.' },
+    { id: 'r368ar02ie8', title: '30 days in MMT and more than two degrees at uni.' },
     { id: 'fOKhUgSqEbg', title: 'Dyslexic FIFO worker learns to trade in 30 days' },
-    { id: 'UKPd1ZIfFls', title: 'He copied a Lambo guru and lost. Then he joined MMT and won.' },
+    { id: 'UKPd1ZIfFls', title: 'Scammed by a Lambo guru, then joined MMT and won.' },
     { id: 'gbsFHFZ4oQ4', title: 'No computer for 14 years. Replaced his income in 14 weeks.' },
     { id: 'ySooVMJtTBk', title: 'FIFO worker, 7 trades, 1 loss, $20K profit' },
     { id: 'cr7BMjsIkSs', title: 'He spent 6 months vetting us. His only criticism, too easy.' },
