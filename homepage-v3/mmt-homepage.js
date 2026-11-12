@@ -149,21 +149,6 @@
 // Year
 document.getElementById('yr').textContent = new Date().getFullYear();
 
-// Mobile only: income calculator sits above "3 steps to get started"
-(function(){
-  var calc = document.querySelector('#mmt-hp3-root .calcbg');
-  var steps = document.querySelector('#mmt-hp3-root .p-how');
-  if (!calc || !steps || !window.matchMedia) return;
-  var home = calc.previousElementSibling;
-  var mq = window.matchMedia('(max-width:767px)');
-  function place(){
-    if (mq.matches) { steps.parentNode.insertBefore(calc, steps); }
-    else if (home && home.parentNode) { home.parentNode.insertBefore(calc, home.nextElementSibling); }
-  }
-  place();
-  if (mq.addEventListener) mq.addEventListener('change', place); else if (mq.addListener) mq.addListener(place);
-})();
-
 // Header: show once the visitor starts scrolling, hide again at the very top
 (function(){
   var h = document.getElementById('hdr');
