@@ -145,6 +145,7 @@
     @media(min-width:641px){#mmt-hp3-root .eop-card p{font-size:14px;line-height:1.5}#mmt-hp3-root .countdown .proof-d{margin-top:28px}}
     @media(max-width:900px) and (min-width:641px){#mmt-hp3-root .eop-grid{grid-template-columns:1fr 1fr}}
     @media(max-width:640px){#mmt-hp3-root .eop{padding:36px 16px 0}#mmt-hp3-root .eop-h{font-size:30px;margin-bottom:18px}#mmt-hp3-root .eop-grid{grid-template-columns:1fr 1fr;gap:10px}#mmt-hp3-root .eop-card{padding:16px 14px}#mmt-hp3-root .eop-card b{width:32px;height:32px;margin-bottom:10px;font-size:14px}#mmt-hp3-root .eop-card h3{font-size:15px}#mmt-hp3-root .eop-card p{font-size:12.5px}}
+    @media(min-width:641px){#mmt-hp3-root .education-title{white-space:nowrap}#mmt-hp3-root .education-title>span{display:inline}}
     @media(max-width:640px){#mmt-hp3-root .education-title{line-height:1.04}#mmt-hp3-root .education-title>span{font-size:min(10.6cqi,46px);text-wrap:balance}#mmt-hp3-root .education-title .et-nw{white-space:nowrap}}
   `;
   document.head.appendChild(styleEl);
